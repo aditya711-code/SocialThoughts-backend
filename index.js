@@ -61,7 +61,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT,"0.0.0.0", () => {
       console.log(`Server Port:${PORT}`);
       /*ADD DATA ONE*/
       // User.insertMany(users);
