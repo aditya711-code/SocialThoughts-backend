@@ -1,4 +1,17 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
+export const getUsersBySearch = async (req, res) => {
+  try {
+    const { searchName } = req.query;
+    const name = new RegExp(searchName, "i");
+    const users = await User.find({
+      $or: [{ firstName: name }, { lastName: name }],
+    });
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -22,7 +35,7 @@ export const getUserFriends = async (req, res) => {
         return { _id, firstName, lastName, occupation, location, picturePath };
       }
     );
-    console.log("Friends", formattedFriends);
+
     res.status(200).json(formattedFriends);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -58,6 +71,39 @@ export const addRemoveFriend = async (req, res) => {
       }
     );
     res.status(200).json(formattedFriends);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+export const updateUser = async (req, res) => {
+  console.log("event called");
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    console.log("req", req.body);
+    const updates = req.body;
+    await User.updateOne(
+      { _id: id },
+      {
+        $set: updates,
+      }
+    );
+    if (
+      user.firstName != updates.firstName ||
+      user.lastName != updates.lastName
+    ) {
+      await Post.updateMany(
+        { userId: id },
+        {
+          $set: {
+            firstName: updates.firstName,
+            lastName: updates.lastName,
+          },
+        }
+      );
+    }
+    const newuser = await User.findById(id);
+    return res.status(200).json(newuser);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
