@@ -76,11 +76,9 @@ export const addRemoveFriend = async (req, res) => {
   }
 };
 export const updateUser = async (req, res) => {
-  console.log("event called");
   try {
     const { id } = req.params;
     const user = await User.findById(id);
-    console.log("req", req.body);
     const updates = req.body;
     await User.updateOne(
       { _id: id },
@@ -90,7 +88,9 @@ export const updateUser = async (req, res) => {
     );
     if (
       user.firstName != updates.firstName ||
-      user.lastName != updates.lastName
+      user.lastName != updates.lastName ||
+      user.location != updates.location ||
+      user.picturePath != updates.picturePath
     ) {
       await Post.updateMany(
         { userId: id },
@@ -98,6 +98,8 @@ export const updateUser = async (req, res) => {
           $set: {
             firstName: updates.firstName,
             lastName: updates.lastName,
+            location: updates.location,
+            userPicturePath: updates.picturePath,
           },
         }
       );
