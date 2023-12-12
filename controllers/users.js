@@ -83,27 +83,28 @@ export const updateUser = async (req, res) => {
     await User.updateOne(
       { _id: id },
       {
-        $set: updates,
+        $set: {
+          firstName: updates.firstName,
+          lastName: updates.lastName,
+          picturePath: updates.picturePath,
+          location: updates.location,
+          occupation: updates.occupation,
+        },
       }
     );
-    if (
-      user.firstName != updates.firstName ||
-      user.lastName != updates.lastName ||
-      user.location != updates.location ||
-      user.picturePath != updates.picturePath
-    ) {
-      await Post.updateMany(
-        { userId: id },
-        {
-          $set: {
-            firstName: updates.firstName,
-            lastName: updates.lastName,
-            location: updates.location,
-            userPicturePath: updates.picturePath,
-          },
-        }
-      );
-    }
+
+    await Post.updateMany(
+      { userId: id },
+      {
+        $set: {
+          firstName: updates.firstName,
+          lastName: updates.lastName,
+          location: updates.location,
+          userPicturePath: updates.picturePath,
+        },
+      }
+    );
+
     const newuser = await User.findById(id);
     return res.status(200).json(newuser);
   } catch (err) {
